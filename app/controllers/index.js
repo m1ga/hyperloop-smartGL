@@ -7,18 +7,21 @@ var RenderPassSprite = require("fr.arnaudguyon.smartgl.opengl.RenderPassSprite")
 var SmartGLRenderer = require("fr.arnaudguyon.smartgl.opengl.SmartGLRenderer");
 var Sprite = require("fr.arnaudguyon.smartgl.opengl.Sprite");
 var renderPassSprite = new RenderPassSprite();
-var smartGLView = new SmartGLView(Ti.Android.currentActivity);
+var smartGLView = new SmartGLView(activity);
 var TouchHelperEvent = require("fr.arnaudguyon.smartgl.touch.TouchHelperEvent");
 //var touchHelper = new TouchHelperEvent();
 
 function onOpen(e) {
-	smartGLView.setDefaultRenderer(Ti.Android.currentActivity);
-
+	console.log("open");
+	console.log("set renderer");
+	smartGLView.setDefaultRenderer(activity);
+	console.log("renderer set");
 	var smartController = new SmartGLViewController({
-		onPrepareView: function() {
+		onPrepareView: function(glview) {
+			console.log("on prepare");
 			var renderer = smartGLView.getSmartGLRenderer();
 			renderer.addRenderPass(renderPassSprite);
-
+	
 			var sprite = new Sprite(100, 100);
 			mSprite.setPivot(0.5, 0.5);
 			mSprite.setPos(60, 60);
@@ -26,22 +29,33 @@ function onOpen(e) {
 			renderPassSprite.addSprite(mSprite);
 			return true;
 		},
-		onReleaseView: function() {
+		onReleaseView: function(glview) {
+			console.log("on release");
 			return true;
 		},
-		onTick: function() {
+		onTick: function(glview) {
 			console.log("Tick");
 			return true;
 		},
-		onTouchEvent: function() {
+		onTouchEvent: function(glview, touchEvent) {
 			console.log("touch");
+			return true;
+		},
+		onResizeView: function(glview) {
+			console.log("resize");
 			return true;
 		}
 	});
-	// adding interfaces
-	// smartGLView.setController(smartController); // TODO freezing the app :(
-}
 
+	// make transparent view
+	//smartGLView.setZOrderOnTop(true);
+	//smartGLView.getSmartGLRenderer().setClearColor(0,0,0,0);
+
+	// adding interfaces	
+	console.log("set controller");
+	smartGLView.setController(smartController);
+	console.log("controller set");
+}
 $.index.addEventListener("open", onOpen);
 $.index.add(smartGLView);
 $.index.open();
